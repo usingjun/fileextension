@@ -41,6 +41,9 @@ public class FileExtensionService {
         if (normalized.length() > 20) {
             throw new RuntimeException("커스텀 확장자 길이는 20자리 이하여야 합니다.");
         }
+        if (!normalized.matches("^[a-z0-9][a-z0-9_-]*[a-z0-9]$")) {
+            throw new RuntimeException("확장자는 영문, 숫자, 하이픈(-), 언더바(_)만 사용 가능하며 특수문자로 시작하거나 끝날 수 없습니다.");
+        }
         if (isFixedExtension(normalized)) {
             throw new RuntimeException("고정 확장자에 포함된 파일 확장자입니다.");
         }
