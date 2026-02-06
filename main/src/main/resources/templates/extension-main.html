@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>확장자 설정</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; }
+        .container { width: 600px; border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
+        h2 { font-size: 18px; margin-top: 0; }
+        hr { margin-bottom: 20px; border: 0; border-top: 1px solid #eee; }
+        .section { display: flex; margin-bottom: 20px; align-items: flex-start; }
+        .label-col { width: 120px; font-weight: bold; padding-top: 5px; }
+        .content-col { flex: 1; }
+        .checkbox-group label { margin-right: 15px; cursor: pointer; font-size: 14px; }
+        .input-group { display: flex; gap: 10px; }
+        .input-group input { flex: 1; padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        .input-group button { padding: 5px 15px; cursor: pointer; background: #eee; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; }
+        .tag-box { border: 1px solid #ccc; border-radius: 4px; padding: 10px; min-height: 200px; position: relative; margin-top: 10px; }
+        .count-label { position: absolute; top: -25px; left: 0; font-size: 13px; color: #666; }
+        .tag-list { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0; }
+        .tag { background: #f0f0f0; border: 1px solid #ddd; border-radius: 5px; padding: 2px 8px; font-size: 14px; display: flex; align-items: center; color: #333; }
+        .delete-btn { margin-left: 8px; cursor: pointer; border: none; background: none; color: #999; font-weight: bold; padding: 0; font-size: 12px; }
+        .delete-btn:hover { color: black; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>◎ 확장자 설정</h2>
+    <hr>
+
+    <div class="section">
+        <div class="label-col">고정 확장자</div>
+        <div class="content-col checkbox-group">
+            <th:block th:each="extEnum : ${allFixedExtensions}">
+                <label>
+                    <input type="checkbox"
+                           th:value="${extEnum.getLowerCaseName()}"
+                           th:checked="${#lists.contains(checkedFixedList, extEnum.getLowerCaseName())}"
+                           onchange="submitFixedToggle(this.value)">
+                    <span th:text="${extEnum.getLowerCaseName()}">bat</span>
+                </label>
+            </th:block>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="label-col">커스텀 확장자</div>
+        <div class="content-col">
+            <form th:action="@{/extensions/custom}" method="post" class="input-group">
+                <input type="text" name="extension" placeholder="확장자 입력" maxlength="20" required>
+                <button type="submit">+추가</button>
+            </form>
+
+            <div style="position: relative; margin-top: 30px;">
+                <div class="count-label">
+                    <span th:text="${customList.size()}">0</span>/200
+                </div>
+                <div class="tag-box">
+                    <ul class="tag-list">
+                        <li class="tag" th:each="item : ${customList}">
+                            <span th:text="${item.extension}">test</span>
+                            <form th:action="@{/extensions/custom}" method="post" style="display:inline;">
+                                <input type="hidden" name="_method" value="delete"/>
+                                <input type="hidden" name="extension" th:value="${item.id}"/>
+                                <button type="submit" class="delete-btn">X</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 에러 메시지 처리
+    const errorMessage = /*[[${errorMessage}]]*/ null;
+    if (errorMessage) {
+        alert(errorMessage);
+    }
+
+    // 고정 확장자 체크박스 클릭 시 바로 전송
+    function submitFixedToggle(value) {
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = '/extensions/fixed';
+
+        const hiddenField = document.createElement('input');
+        hiddenField.type = 'hidden';
+        hiddenField.name = 'extension';
+        hiddenField.value = value;
+
+        form.appendChild(hiddenField);
+        document.body.appendChild(form);
+        form.submit();
+    }
+    /*]]>*/
+</script>
+
+</body>
+</html>
